@@ -1,0 +1,30 @@
+Why should we use frameworks?
+framework analogy :
+    Suppose we want a wardrobe from IKEA then what generally happens is that
+    we get all the right components for our DIY and ofc a manual.
+
+    With framework, we get every possible components, and we just have to get right
+    component in right manner.
+
+    Bottom line -> The application framework offers you various pieces of software
+                  you need to build your app. You need to know what features to choose and how to
+                  assemble them to achieve the right result.
+For e.g.
+         David ordered a wardrobe from the UAssemble store. But the store (framework) doesn’t
+         deliver to David (the programmer) just the components (software capabilities) he needs to build his new
+         wardrobe (the app). The store ships him all the possible parts he might need to build the wardrobe. It’s
+         David’s (the programmer’s) choice on which components (software capabilities) are right and how to
+         assemble them to get the right result (the application).
+
+You can imagine the Spring framework as a solar system with the SpringCore in the center. The software capabilities(e.g. Spring MVC, Spring Data Access, Spring testing) are planets around Spring Core kept close to it by its gravitational field.
+
+Since we now know that Spring core is that important we will try to deep dive:
+    Spring Core is the part of the Spring framework that provides the foundational mechanisms to integrate into apps.
+    Spring works based on the principle inversion of control (IoC).
+    -> A software design principle where a framework or container controls the flow of a program, rather than the developer's code
+
+    Spring is a good fit:
+    1 The development of a backend app
+    2 The development of an automation testing framework
+    3 The development of a desktop app
+    4 The development of a mobile app

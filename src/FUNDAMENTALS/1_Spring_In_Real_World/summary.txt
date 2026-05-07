@@ -1,0 +1,37 @@
+Summary
+An application framework is a set of common software functionalities that provides a foundational structure for developing an application. A framework acts
+as the skeletal support to build an application.
+
+A framework helps you build an app more efficiently by providing functionality
+that you assemble to your implementation instead of developing it yourself.
+Using a framework saves you time and helps ensure there are fewer chances of
+implementing buggy features.
+
+Using a widely known framework like Spring opens a door to a large community,
+which makes it more likely that others will face similar problems. You then have
+an excellent opportunity to learn about how others solved something similar to
+an issue you need to address, which will spare you the time of individual research.
+
+When implementing an application, always think of all possibilities, including
+not using a framework. If you decide to use one or more frameworks, take into
+consideration all their alternatives. You should think about the purpose of the
+framework, who else is using it (how big the community is), and for how long
+it’s been on the market (maturity).
+
+Spring is not just a framework. We often refer to Spring as “Spring framework”
+to indicate the core functionalities, but Spring offers an entire ecosystem
+formed of many projects used in application development. Each project is dedicated to a specific domain, and when implementing an app, you might use
+more of these projects to implement the functionality you desire. The projects
+of the Spring ecosystem we’ll use in this book are as follows:
+    – Spring Core, which builds the foundation of Spring and provides features
+    like the context, aspects, and basic data access.
+    – Spring Data, which provides a high-level, comfortable-to-use set of tools to
+    implement the persistence layer of your apps. You’ll find how easy it is to use
+    Spring Data to work with both SQL and NoSQL databases.
+    – Spring Boot, which is a project of the Spring ecosystem that helps you apply a
+    “convention-over-configuration” approach.
+
+Quite often, learning materials (like books, articles, or video tutorials) offer
+examples with Spring only for backend applications. While it’s true that it’s
+widespread to use Spring with backend apps, you can use Spring with other
+kinds of apps as well, even in desktop applications and automation testing apps.
