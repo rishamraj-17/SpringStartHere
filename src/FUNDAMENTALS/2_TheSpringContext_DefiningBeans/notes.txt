@@ -1,0 +1,62 @@
+context (Application context) -> the container that manages all our instances or object offered to spring framework.
+
+This chapter revolves around the learning for "How to add objects in the context or Application context?"
+
+We call these object instances,  inside context, as "beans".
+
+We can also add "Integer", "String" as beans in context.
+
+Just create a config package and add a ProjectConfig class annotated with @Configuration
+    then write methods that will be annotated with @Bean
+
+Pass ProjectConfig.class as parameter for AnnotationBasedApplicationContext(ProjectConfig.class);
+
+It works fine :)
+
+But what if there are more than one class kind of that bean?? like 3 beans of Parrot.class?
+That will be ambiguous, won't it be?
+
+so along with Parrot.class we also have to pass a parameter refering to specific instance of that class(Parrot.class as in our case).
+
+We can also change name to refer to a specific bean -> @Bean("miki")
+But what if there are thousands of bean of same class, that would be a big problem if we start writing name so what we do instead is we annotate some of bean with @Primary, secondary.
+
+@Bean
+@Primary
+Parrot parrot1(){
+    Parrot miki = new Parrot();
+    miki.setName("miki");
+    return miki;
+}
+
+...now if there are multiple beans then it won't be ambiguous.
+
+This one was config file method but there are also few other like annotation method.
+
+We just need to perform two simple steps:
+1. Annotate desired class with @Component
+2. Add @ComponentScan(basePackages="main")
+
+We should also use @PreConstruct to perform something as like adding name or other info
+
+But wait, what if we want to only register a bean in context if the object does satisfy
+some condition like only Parrot of green color or something :)
+
+We use registerBean() method for such custom registration
+
+All we need is to give 3 parameters to this method
+    1. name for the bean
+    2. class of the bean
+    3. supplier class that gives us with this instance
+
+public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ProjectConfig.class);
+
+        Parrot x = new Parrot();
+        x.setName("nims");
+        Supplier<Parrot> parrotSupplier = () -> x;
+        context.registerBean("parrot1", Parrot.class, parrotSupplier);
+
+        Parrot p = context.getBean(Parrot.class);
+        System.out.println(p.getName());
+    }
