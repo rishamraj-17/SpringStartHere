@@ -1,0 +1,5 @@
+The chapter is all about establishing the relation between beans.
+
+ Say we have two instances in the Spring context: a parrot and a person. We’ll create
+and add these instances to the context. We want to make the person own the parrot.
+In other words, we need to link the two instances.
