@@ -3,3 +3,37 @@ The chapter is all about establishing the relation between beans.
  Say we have two instances in the Spring context: a parrot and a person. We’ll create
 and add these instances to the context. We want to make the person own the parrot.
 In other words, we need to link the two instances.
+
+We can set the attribute through field from context itself..
+public class Person {
+    private String name;
+    @Autowired
+    private Parrot parrot;
+
+    //Here @Autowired will get the parrot bean from the context.
+
+    //getters and setters
+
+    @Override
+    public String toString() {
+        return "Person name : "+name +" "+getParrot().toString();
+    }
+}
+
+@Configuration
+public class ProjectConfig{
+    @Bean
+    public Parrot parrot(){
+        Parrot parrot = new Parrot();
+        parrot.setName("koko");
+        return parrot;
+    }
+
+    @Bean
+    public Person person(){
+        Person person = new Person();
+        person.setName("Nimita");
+        return person;
+    }
+    //Here we didn't set parrot or its name in the config file but spring did  it for us :)
+}
