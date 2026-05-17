@@ -1,0 +1,20 @@
+A quick comparison between singleton and prototype bean scopes
+Singleton Prototype
+1 The framework associates a name with an actual
+object instance.
+1 A name is associated with a type.
+2 Every time you refer to a bean name you’ll get the
+same object instance.
+2 Every time you refer to a bean name, you get
+a new instance.
+3 You can configure Spring to create the instances
+when the context is loaded or when first referred.
+3 The framework always creates the object
+instances for the prototype scope when you
+refer to the bean.
+4 Singleton is the default bean scope in Spring. 4 You need to explicitly mark a bean as a
+prototype.
+5 It’s not recommended that a singleton bean to
+have mutable attributes.
+5 A prototype bean can have mutable
+attributes

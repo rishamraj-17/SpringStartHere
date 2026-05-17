@@ -26,3 +26,24 @@ With Spring, you can define as many beans
 of the same type using methods annotated
 with @Bean in the configuration class.
 Each of these beans is a singleton.
+
+#Eager and Lazy instantiation
+eager -> getting all the beans when spring context is initialized.
+lazy -> getting the bean ready only when it is referenced.
+
+#Prototype Beans :
+As you’ll see, the idea is straightforward. Every time
+you request a reference to a prototype-scoped bean, Spring creates a new object
+instance. 
+@Configuration
+public class ProjectConfig {
+ @Bean
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+ public CommentService commentService() {
+ return new CommentService();
+ }
+}
+Spring creates a new instance every time the
+getBean() method is called. The variables cs1
+and cs2 always contain references to two
+different instances.
