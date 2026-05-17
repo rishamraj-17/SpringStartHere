@@ -1,0 +1,28 @@
+So this chapter is going to cover : 
+    Using the singleton bean scope
+    Using eager and lazy instantiation for singleton beans
+    Using the prototype bean scope
+
+We need to go bit deeper to answer how and when exactly spring create beans and then also manages it?
+
+Spring has mutliple approaches to create beans and managing their lifecycle, and in the Spring world we 
+name these approaches 'scopes'. In this chapter, we discuss two scopes you’ll often find in Spring apps: singleton and prototype.
+-> Singleton is the default scope in spring and we have been using it so far.
+
+#Using the singleton bean scope
+@Configuration
+public class ProjectConfig {
+@Bean
+ public CommentService commentService1() {
+ return new CommentService();
+ }
+@Bean
+ public CommentService commentService2() {
+ return new CommentService();
+ }
+} 
+
+With Spring, you can define as many beans
+of the same type using methods annotated
+with @Bean in the configuration class.
+Each of these beans is a singleton.
