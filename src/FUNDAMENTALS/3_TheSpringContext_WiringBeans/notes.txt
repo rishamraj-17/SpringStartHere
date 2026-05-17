@@ -1,0 +1,85 @@
+The chapter is all about establishing the relation between beans.
+
+ Say we have two instances in the Spring context: a parrot and a person. We’ll create
+and add these instances to the context. We want to make the person own the parrot.
+In other words, we need to link the two instances.
+
+We can set the attribute through field from context itself..
+public class Person {
+    private String name;
+    @Autowired
+    private Parrot parrot;
+
+    //Here @Autowired will get the parrot bean from the context.
+
+    //getters and setters
+
+    @Override
+    public String toString() {
+        return "Person name : "+name +" "+getParrot().toString();
+    }
+}
+
+@Configuration
+public class ProjectConfig{
+    @Bean
+    public Parrot parrot(){
+        Parrot parrot = new Parrot();
+        parrot.setName("koko");
+        return parrot;
+    }
+
+    @Bean
+    public Person person(){
+        Person person = new Person();
+        person.setName("Nimita");
+        return person;
+    }
+    //Here we didn't set parrot or its name in the config file but spring did  it for us :)
+}
+
+Now we made some real changes for @Autowired to be used 
+1. cleant the config file :
+
+package config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(basePackages = "model")
+public class ProjectConfig{
+
+}
+
+2. Added @Component to top of each class that i want a piece of bean
+
+With injection to constructor the greatest advantage that i get is that now i can make parrot field as final.
+
+Also there is setter injection but i won't waste my fucking time in this deep shit*.
+
+Now let's think what happens if we need bean A that requires dependency of other bean B that requests the first bean A ?
+-> This is case of circular dependency !
+
+Easy to avoid just don't let it happen bih 
+
+The Person class:
+@Component
+public class Person {
+ private final Parrot parrot;
+ @Autowired
+ public Person(Parrot parrot) {
+ this.parrot = parrot;
+ }
+ // Omitted code
+}
+The Parrot class:
+public class Parrot {
+ private String name = "Koko";
+ private final Person person;
+ @Autowired
+ public Parrot(Person person) {
+ this.person = person;
+ }
+ // Omitted code
+}

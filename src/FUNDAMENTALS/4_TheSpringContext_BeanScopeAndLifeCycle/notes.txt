@@ -1,0 +1,106 @@
+In this chapter we are going to talk about decoupling the parts of implementation.
+-> We shall use abstraction for the purpose.
+
+We don't use spring initially and use the abstraction for decoupling the dependency of objects.
+
+An analogy: Suppose you use a ride-sharing app because you need to get somewhere. When you order a trip, you usually don’t care how the car looks or who the
+driver is. You just need to get somewhere. In my case, I don’t care whether a car or a
+spaceship comes to pick me up if I reach the destination in time. The ride-sharing app
+is an interface. The customer doesn’t request a car or a driver, but a trip. Any driver
+with a car who can offer the service can answer the customer’s request. The customer
+and the driver are decoupled through the app (interface); the customer doesn’t know
+who the driver is nor which car will pick them up before a car responds to their
+request, and the driver doesn’t need to know who they do the service for. Using this
+analogy, you can deduce the role of interfaces in relationship with objects in Java.
+
+The DeliveryDetailsPrinter directly delegates the sorting
+responsibility to the SorterByAddress object. If we keep this class design, we may face
+difficulties later if we need to change this functionality. Let’s imagine you need to
+change the printed details order later, and the new order is by the sender’s name. You’d
+need to replace the SorterByAddress object with another one implementing the new
+responsibility, but you’d also need to change the DeliveryDetailsPrinter object that
+uses the sorting responsibility (figure 4.2).
+DeliveryDetailsPrinter SorterByAddress
+Uses
+printDetails() sortDetails()
+To sort the details before printing, the
+DeliveryDetailsPrinter needs to sort
+the details by their delivery addresses.
+The DeliveryDetailsPrinter delegates the
+sorting responsibility to another object.
+The SorterByAddress object
+implements the sorting responsibility.
+Figure 4.1 The DeliveryDetailsPrinter object delegates the responsibility of sorting the
+delivery details by the delivery addresses to another object named SorterByAddress.
+public class DeliveryDetailsPrinter {
+ private SorterByAddress sorter;
+ public DeliveryDetailsPrinter(SorterByAddress sorter) {
+ this.sorter = sorter;
+ }
+ public void printDetails() {
+ sorter.sortDetails();
+ // printing the delivery details
+ }
+}
+
+->As discussed earlier, an object only needs to specify what it
+needs and stay completely unaware of how the what is implemented. We do this, of
+course, by using interfaces.
+
+We’ll implement this requirement using plain
+Java, without any framework, and we’ll focus on objects’ responsibilities and using
+interfaces to decouple them. At the end of this section, we’ll have a project defining
+some objects that collaborate to implement a use case. 
+
+The requirement scenario :
+    We need to develop an app feature for team that uses app to publish comment, i.e
+    a. Store published comment in the database
+    b. Send email notification to directed person.
+First we will implement feature without using spring. Here are some key points :
+A. service -> that implement use case.
+B. repository -> that interacts directly with database.
+C. proxies -> that will communicate or relay message outside of the app.(email, whatsapp)
+
+But wait! Didn’t we say we shouldn’t use direct coupling between implementations? We need to make sure we decouple the implementations by using interfaces. In
+the end, the CommentRepository might now use a database to store the comments.
+But in the future, maybe this needs to be changed to use some other technology or an
+external service. We can say the same for the CommentNotificationProxy object. Now
+it sends the notification by email, but maybe in a future version the comment notification needs to be sent through some other channel. We certainly want to make sure we
+decouple the CommentService from the implementations of its dependencies so that
+when we need to change the dependencies, we don’t need to change the object using
+them as well. 
+
+Main app:
+        //feeding dependencies to service class
+        CommentRepo commentRepo = new CommentRepo();
+        CommentProxies commentProxies = new CommentProxies();
+        CommentServices commentServices = new CommentServices(commentProxies,commentRepo);
+
+        //feeding comment object to serviceClass's method
+        Comment comment = new Comment();
+        comment.setCommentText("Demo Comment");
+        comment.setPublisher("Laurentia");
+        commentServices.publishComment(comment);
+
+Comment Service :
+    package services;
+
+    import models.Comment;
+    import proxies.CommentProxies;
+    import repositories.CommentRepo;
+
+    public class CommentServices {
+
+        private CommentProxies commentProxies;
+        private CommentRepo commentRepo;
+
+        public CommentServices(CommentProxies commentProxies, CommentRepo commentRepo) {
+            this.commentProxies=commentProxies;
+            this.commentRepo=commentRepo;
+        }
+
+        public void publishComment(Comment comment){
+            commentRepo.storeCommentInPostgreSQL(comment);
+            commentProxies.sendNotificationGmail(comment);
+        }
+    }

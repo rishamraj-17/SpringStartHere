@@ -1,0 +1,20 @@
+The first question that might pop in our brain is : Deciding which objects should be part of the Spring context??
+-> In our case, we need to add the object to the Spring context if it
+either has a dependency we need to inject from the context or if it’s a dependency
+itself.
+
+so for our project in use we have 3 such classes hitting our match case :
+1. CommentService -> it has 2 dependency to get from context
+2. CommentProxies & CommentRepository -> since these are dependency themselves.
+
+So we annotate these 3 classes with @Component
+and we also add ProjectConfig.class in parameter of AnnotationConfigApplicationContext();
+and ofc add @ComponentScan(basePackages = {....,......,.....}) -> {} because there are multiple
+
+We annotate our constructor in CommentService with @Autowired so that it receives beans from the context 
+That's constructor injection.(CI)
+
+We also do have options to inject beans via field injection or setter injection but we just stick with real-world usage more of CI.
+The main edge get is : making able to mark field as final
+
+We also looked at how we can manage lot of beans of same class 
