@@ -34,3 +34,43 @@ Spring gives you a proxy object instead of the real bean. You will now receive t
 instead of the bean anytime you get the bean from the context, either if you directly
 use the getBean() method of the context or if you use DI (figure 6.3). This approach
 is named weaving.
+
+ Let’s now enhance
+the project with an aspect class that intercepts the method call and adds an output
+before and after the call.
+     To create an aspect, you follow these steps :
+1 Enable the aspect mechanism in your Spring app by annotating the configuration class with the @EnableAspectJAutoProxy annotation.
+->
+1. Enable aspects in your Spring app.
+@Configuration
+@ComponentScan(basePackages = "services")
+@EnableAspectJAutoProxy
+public class ProjectConfig {
+}
+2 Create a new class, and annotate it with the @Aspect annotation. Using either
+@Bean or stereotype annotations, add a bean for this class in the Spring context.
+2. Create an aspect class, and add
+an aspect bean to the Spring context.
+@Aspect
+public class LoggingAspect {
+}
+3 Define a method that will implement the aspect logic and tell Spring when and
+which methods to intercept using an advice annotation.
+3. Define a method to implement
+the aspect logic, and use an advice
+annotation to tell Spring when and
+what to intercept.
+@Around("execution(* services.*.*(..))")
+ public void log(ProceedingJoinPoint joinPoint) {
+ }
+4 Implement the aspect logic.
+4. Implement the aspect logic.
+@Around("execution(* services.*.*(..))")
+ public void log(ProceedingJoinPoint joinPoint) {
+// aspect logic here
+ }
+
+ Note : If you don’t call the proceed()
+method of the ProceedingJoinPoint
+parameter, the aspect never delegates
+to the intercepted method.
