@@ -1,0 +1,36 @@
+An aspect is simply a piece of logic the framework executes when you call specific
+methods of your choice. When designing an aspect, you define the following:
+** What code you want Spring to execute when you call specific methods. This is
+named an aspect.
+** When the app should execute this logic of the aspect (e.g., before or after the
+method call, instead of the method call). This is named the advice.
+** Which methods the framework needs to intercept and execute the aspect for
+them. This is named a pointcut.
+
+As in the case of the dependency injection, to use aspects you need the framework
+to manage the objects for which you want to apply aspects. You’ll use the approaches
+you learned in chapter 2 to add beans to the Spring context to enable the framework
+to control them and apply aspects you define. 
+**The bean, that declares the method, intercepted by an aspect is named the target object.
+
+To become an aspect target, the object needs to
+be a bean in the Spring context. Spring needs
+to know the objects it has to manage.
+@Service -> adds the bean
+public class CommentService {
+ public void publishComment(Comment comment) {
+ // do something
+ }
+}
+We want some logic(i.e aspect) to be executed before(or after i.e advice) each
+execution of method publishComment() (i.e pointcut),
+which belongs to the CommentService bean(i.e target object).
+
+But how does Spring intercept each method call and apply the aspect logic? As discussed earlier in this section, the object needs to be a bean in the Spring context. But
+because you made the object an aspect target, Spring won’t directly give you an
+instance reference for the bean when you request it from the context. Instead, Spring
+gives you an object that calls the aspect logic instead of the actual method. We say that
+Spring gives you a proxy object instead of the real bean. You will now receive the proxy
+instead of the bean anytime you get the bean from the context, either if you directly
+use the getBean() method of the context or if you use DI (figure 6.3). This approach
+is named weaving.
