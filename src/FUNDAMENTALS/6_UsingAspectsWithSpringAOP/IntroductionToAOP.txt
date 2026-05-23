@@ -1,0 +1,49 @@
+Before AOP, we detour Functional Programming.
+-> In old programming languages like C, what happens is that there is everything going on inside function.
+The main function calls some other helper function A and B
+A calls C and D while B calls E and F../ and so on
+When last function executes then program terminates.
+    But with function growing in large numbers, the connecting graph could get messy.
+    So we got OOP to solve this problem.
+
+Problem Statement : What about common procedure or methods?
+Object A
+fn.....logMessage()....otherfn
+Object B
+fn.....logMessage()....otherfn
+Object C
+fn.....logMessage()....otherfn
+-> but this isn't good design because we have to write a lot of code in each class.
+
+The solution to this problem can be that we make a separate class as Log and make a method as logMessage() and add it as dependency in each class object, goods sound right??
+But there lie some problem with this design, as listed below:
+1. too many relationships to crosscutting objects.
+2. code is still required in all methods.
+3. can't change to call other method implementation of same kind at a single place
+
+#Cross Cutting concern
+A. Logging B. Transaction C. Security
+-> these appear in lot of place even if they aren't part of business logic.
+
+Now let's see what aspect is and how it solves this crosscutting concerns.
+
+So what we do is remove the common methods from all the class.
+Object A
+fn.....//....otherfn
+Object B
+fn.....//....otherfn
+Object C
+fn.....//....otherfn
+
+and create a separate Aspect called as LoggingAspect.
+This is actually a special class with some greater privileges.
+
+What's actually different from a simple class is that we don't refer to this object where we want to call those methods inside some other methods.
+Instead, what we have is a configuration file where we mention that I want to perform certain things when this specific method is called.
+
+The bottom line is that aspect gets their real power by "Wrapping around the methods"
+Aspect Code --> Target Method --> Aspect Code
+
+Steps in AOP
+1. Write aspect code
+2. Configure where aspect apply
