@@ -1,0 +1,10 @@
+n part 2, you’ll learn to implement apps using Spring capabilities you’ll often
+need in the real world. We’ll start by discussing web apps. Further, you’ll learn
+how to exchange data between apps and work with persisted data. You’ll find that
+Spring makes this straightforward and easy. We’ll end the book with writing unit
+and integration tests for the functionalities you implement in your Spring apps.
+ The skills you’ll learn in part 2 rely on understanding the foundation that
+supports Spring: the Spring context and aspects. You can start directly with part
+2 if you already know how Spring context and aspects work and you’re eager to
+implement apps that use Spring capabilities. However, if you are not yet confident with the Spring context and aspects, it is a better idea to start with part 1
+and learn these things first.
