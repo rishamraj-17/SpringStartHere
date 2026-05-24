@@ -1,0 +1,18 @@
+7.2 The magic of Spring Boot
+To create a Spring web app, we need to configure a servlet container, create a servlet
+instance, and then make sure we correctly configure this servlet instance such that
+Tomcat calls it for any client request. What a headache to write so many configurations! Many years ago, when I was teaching Spring 3 (the latest Spring version at that
+time) and we configured web apps, this was the part both the students and I hated the
+most. Fortunately, times changed, and today I don’t have to bother you by teaching
+such configurations.
+
+ Listed here are what I consider the most critical Spring Boot features, and what
+they offer:
+ Simplified project creation—You can use a project initialization service to get an
+empty but configured skeleton app.
+ Dependency starters—Spring Boot groups certain dependencies used for a specific purpose with dependency starters. You don’t need to figure out all the
+must-have dependencies you need to add to your project for one particular purpose nor which versions you should use for compatibility.
+ Autoconfiguration based on dependencies—Based on the dependencies you added
+to your project, Spring Boot defines some default configurations. Instead of
+writing all the configurations yourself, you only need to change the ones provided by Spring Boot that don’t match what you need. Changing the configs
+likely requires less code (if any).
