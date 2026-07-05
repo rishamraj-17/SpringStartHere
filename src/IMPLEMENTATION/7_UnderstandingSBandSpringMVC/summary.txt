@@ -1,0 +1,38 @@
+People use web apps more often today than they use desktop apps. For this rea-
+
+
+
+
+
+
+
+son, you must understand how web apps work and learn to implement them.
+A web app is an application the user interacts with using a web browser. A web
+app has a client side and a server side where the data is processed and stored.
+The client side (frontend) sends requests to the server side (backend). The
+backend executes the action requested by the frontend and responds back.
+Spring offers you the capability of implementing web apps. To avoid writing
+many configurations, you can use Spring Boot: a Spring ecosystem project that
+applies the convention-over-configuration principle providing you default con-
+figurations for the capabilities your app needs.
+Spring Boot also helps you more easily configure your dependencies through
+the dependency starters it offers. A dependency starter is a group of dependen-
+cies with comparable versions to offer your app a specific capability.
+To get the HTTP requests and deliver the responses, a Java backend web app
+needs a servlet container (e.g., Tomcat): software with the capability to translate
+HTTP requests and responses to the Java app. With servlet containers, you
+don’t need to implement the communication over the network using the HTTP
+protocol.
+You can easily create your web app project as a Spring Boot project, which auto-
+configures a servlet container and comes with the capabilities you need to write
+the use cases of your web app. Spring Boot also configures a set of components
+that intercept and manage HTTP requests. These components are part of a
+class design we name Spring MVC.
+Because Spring Boot autoconfigures the Spring MVC components and the serv-
+let container, you only need to write the HTML document containing the data
+the app sends as a response and a controller class for a minimal HTTP request-
+response flow action.
+You use annotations to configure your controller and the controller’s actions.
+To mark a class as a Spring MVC controller, use the @Controller stereotype
+annotation. To assign a controller action to a specific HTTP request, use the
+@RequestMapping annotation.
