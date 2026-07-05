@@ -1,0 +1,130 @@
+7.1.1 A general overview of a web app
+In this section, we take a high-level look at what a web app is from the technical standpoint.
+This overview allows us to discuss in further detail our options for creating web apps.
+First, a web app is composed of two parts:
+
+ The client side is what the user directly interacts with. A web browser represents
+the client side of a web app. The browser sends requests to a web server,
+receives responses from it, and provides a way for the user to interact with the
+app. We also refer to the client side of a web app as the frontend.
+
+ The server side receives requests from the client and sends back data in response.
+The server side implements logic that processes and sometimes stores the client
+requested data before sending a response. We also refer to the server side of a
+web app as the backend.
+
+We classify the approaches of creating a web app as the following:
+1.Apps where the backend provides the fully prepared view in response to a client’s request.
+	The browser directly interprets the data received from the backend and displays
+	this information to the user in these apps. We discuss this approach and imple-
+	ment a simple app to prove it in this chapter. We then continue our discussion
+	with more complex details relevant to production apps in chapters 8 and 9.
+2. Apps using frontend-backend separation. 
+	For these apps, the backend only serves raw
+	data. The browser doesn’t display the data in the backend’s response directly.
+	The browser runs a separate frontend app that gets the backend responses, pro-
+	cesses the data, and instructs the browser what to display. We discuss this
+	approach and implement examples of it in chapter 9.
+
+7.1.3 Using a servlet container in web app development
+One of the most important things to consider is the communication between the
+client and the server. A web browser uses a protocol named Hypertext Transfer Proto-
+col (HTTP) to communicate with the server over the network. This protocol accu-
+rately describes how the client and the server exchange data over the network.
+	In fact, what you need is not only something that understands HTTP, but some-
+thing that can translate the HTTP request and response to a Java app. This something
+is a servlet container (sometimes referred to as a web server): a translator of the HTTP
+messages for your Java app. This way, your Java app doesn’t need to take care of imple-
+menting the communication layer. One of the most appreciated servlet container
+implementations is Tomcat, which is also the dependency we’ll use for the examples
+in this book.
+
+When the client sends a request                                 The servlet container translates
+to a specific path, the servlet                                 the HTTP request and response
+container calls the servlet registered                          to Java objects when calling the
+at that specific path.                                          servlet associated with the path.
+          \                                                                     /
+           \                                                                   /
+            v                                                                 v
+   +-----------------+           HTTP REQUEST            +---------------------------------------+
+   |   ___________   | -------> HTTP GET /invoice ---->  | Tomcat             +----------------+ |
+   |  | www.      |  |                                   | servlet container  |ProductPage     | |
+   |  |-----------|  |                                   |                    |        /product| |
+   |  |   |       |  |                                   |                    +----------------+ |
+   |  |  |||      |  |                                   |                    +----------------+ |
+   |  |  |||*     |  |                                   |                    |ClientPage      | |
+   |  |___________|  |                                   |                    |         /client| |
+   |                 |           HTTP RESPONSE           |                    +----------------+ |
+   |     [Browser]   | <-------------------------------- | .................> +----------------+ |
+   +-----------------+                                   | <................  |InvoicePage     | |
+                                                         |                    |        /invoice| |
+                                                         |                    +----------------+ |
+                                                         |                    +----------------+ |
+                                                         |                    |PaymentPage     | |
+                                                         |                    |        /payment| |
+                                                         |                    +----------------+ |
+                                                         +---------------------------------------+
+                                                                             ^
+                                                                             |
+                                                      The servlet container registers multiple
+                                                      servlet instances. Each servlet is a Java
+                                                      object registered for a specific path.
+But you do
+need to remember the servlet is the entry point to your app’s logic. It’s the compo-
+nent the servlet container (Tomcat, in our case) directly interacts with. It’s how the
+request data enters your app and how the response goes through Tomcat back to the
+client.
+
+CLIENT                               SERVER
++------------------+             +-----------------------------------+
+|  Browser / App   |             |                                   |
+|                  |             |   +---------------+---------------+
+|                  |             |   |               |               |
+|                  |------------>|   |  Tomcat       |  Spring App   |
+|                  | HTTP REQUEST|   |  servlet      |               |
+|                  |             |   |  container    |  +---------+  |
+|                  |             |   |               |  |  Spring |  |
+|                  |<------------|   |               |  |  app's  |  |
+|                  | HTTP        |   |               |  | servlet |  |
+|                  | RESPONSE    |   |               |  +---------+  |
+|                  |             |   |               |       |       |
++------------------+             +---+---------------+-------|-------+
+                                                             |
+                                      (The servlet is registered into 
+                                       the Tomcat servlet container)
+Figure 7.8 The Spring app defines a servlet object and registers it into the servlet container. Now both Spring
+and the servlet container know this object and can manage it. The servlet container calls this object for any
+client request, allowing the servlet to manage the request and the response.
+
++----------+          +----------+          +-----------------------------------------------------+
+|          |   (1)    |          |   (2)    |                     Spring App                      |
+|          | =======> |          | =======> |  +--------------------+                             |
+|          |          |          |          |  |                    | === (3) ===> [Handler Mapping]|
+|  Client  |          |  Tomcat  |          |  |                    | <===========                  |
+| (Browser)|          |          |          |  |     Dispatcher     |                             |
+|          |          |          |          |  |      Servlet       | === (4) ===> [ Controller ]   |
+|          | <======= |          | <======= |  |                    | <===========                  |
+|          |   (7)    |          |   (6)    |  |                    |                             |
+|          |          |          |          |  |                    | === (5) ===> [View Resolver]  |
++----------+          +----------+          |  +--------------------+                             |
+                                            +-----------------------------------------------------+
+                                          
+Figure 7.18 The Spring MVC architecture. In the diagram, you find the main components of Spring MVC. These
+components and the way they collaborate are responsible for a web app’s behavior. The controller (shaded
+differently) is the only component you implement. Spring Boot configures the other components.
+
+Steps : 
+1. The client makes an HTTP request.
+
+2. Tomcat accepts the request and delivers it to the Spring app. A component named dispatcher servlet takes gets the HTTP request and manages the flow.
+
+3. The dispatcher servlet first needs to find out what method of the controller to call depending on the path and HTTP method of the request. To find the method it uses the handler mapping.
+
+4. Once it knows what controller method to call, the dispatcher servlet calls the method. After execution, the controller method provides the view name and data that needs to be rendered in the view.
+
+5. The dispatcher servlet finds the view and renders it with the data provided by the controller. To find the view to render, the dispatcher servlet uses a component named view resolver.
+
+6. Through Tomcat, the HTTP response is returned to the client.
+
+7. The browser interprets the HTTP response and displays the data.
+
