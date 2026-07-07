@@ -1,0 +1,83 @@
+8.1 Implementing web apps with a dynamic view
+We’ll review the Spring MVC flow and then work on an example to demonstrate how
+the view can get dynamic values from the controller.
+In the example we implemented at the end of chapter 7, the browser’s content was
+the same for every HTTP request for our page. Remember the Spring MVC flow (fig-
+ure 8.3):
+1. The client sends an HTTP request to the web server.
+2. The dispatcher servlet uses the handler mapping to find out what controller
+action to call.
+3. The dispatcher servlet calls the controller’s action.
+4. After executing the action associated with the HTTP request, the controller
+returns the view name the dispatcher servlet needs to render into the HTTP
+response.
+5. The response is sent back to the client.
+
+Number 4 is where we need to make a change. We want the controller not only to
+return the view name but somehow also send data to the view. The view will incorporate 
+this data to define the HTTP response. This way, if the server sends a list of one prod-
+uct, and the page displays the list, the page will display one product. If the controller
+sends two products for the same view, now the displayed data will be different because
+the page will show two products (the behavior you observed in figure 8.1).
+
+8.1.1 Getting data on the HTTP request
+In most cases, to send data through the HTTP request you use one of the following ways:
+ An HTTP request parameter represents a simple way to send values from client to
+server in a key-value(s) pair format. To send HTTP request parameters, you
+append them to the URI in a request query expression. They are also called query
+parameters. You should use this approach only for sending a small quantity of data.
+ An HTTP request header is similar to the request parameters in that the request
+headers are sent through the HTTP header. The big difference is that they
+don’t appear in the URI, but you still cannot send large quantities of data using
+HTTP headers.
+ A path variable sends data through the request path itself. It is the same as for the
+request parameter approach: you use a path variable to send a small quantity of
+data. But we should use path variables when the value you send is mandatory.
+ The HTTP request body is mainly used to send a larger quantity of data (format-
+ted as a string, but sometimes even binary data such as a file). We’ll discuss this
+approach in chapter 10, where you’ll learn to implement REST endpoints.
+
+**
+Required identity of a resource -> path variable
+Optional filtering or configuration -> query parameter
+Request metadata/authentication -> header
+Object, form, file, or large data -> request body
+**
+
+**
+A quick comparison of the request parameters and path variables approaches
+Request parameters
+Path variables
+1 Can be used with optional values.1 Should not be used with optional values.
+2 It is recommended that you avoid a large number2 Always avoid sending more than three path
+of parameters. If you need to use more than three,
+I recommend you use the request body, as you’ll
+learn in chapter 10. Avoid sending more than three
+query parameters for readability.
+variables. It’s even better if you keep a maxi-
+mum of two.
+3 Some developers consider the query expression3 Easier to read than a query expression. For a
+more difficult to read than the path expression.publicly exposed website, it’s also easier for
+search engines (e.g., Google) to index the
+pages. This advantage might make the web-
+site easier to find through a search engine.
+**
+
++-----------------------------------------------------+-----------------------------------------------------+
+|                  Request parameters                 |                    Path variables                   |
++-----------------------------------------------------+-----------------------------------------------------+
+| 1. Can be used with optional values.                | 1. Should not be used with optional values.         |
+|                                                     |                                                     |
+| 2. It is recommended that you avoid a large number  | 2. Always avoid sending more than three path        |
+|    of parameters. If you need to use more than      |    variables. It's even better if you keep a        |
+|    three, I recommend you use the request body, as  |    maximum of two.                                  |
+|    you'll learn in chapter 10. Avoid sending more   |                                                     |
+|    than three query parameters for readability.     |                                                     |
+|                                                     |                                                     |
+| 3. Some developers consider the query expression    | 3. Easier to read than a query expression. For a    |
+|    more difficult to read than the path             |    publicly exposed website, it's also easier for   |
+|    expression.                                      |    search engines (e.g., Google) to index the       |
+|                                                     |    pages. This advantage might make the website     |
+|                                                     |    easier to find through a search engine.          |
++-----------------------------------------------------+-----------------------------------------------------+
+
