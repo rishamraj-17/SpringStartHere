@@ -1,0 +1,58 @@
+In any Spring app, you can choose to declare a bean as one of the following:
+ Singleton—The default bean scope in Spring, for which the framework
+uniquely identifies each instance with a name in the context
+ Prototype—The bean scope in Spring, for which the framework only manages
+the type and creates a new instance of that class every time someone requests
+it (directly from the context or through wiring or auto-wiring).
+
+In this chapter, you’ll learn that in web apps you can use other bean scopes that are
+relevant only to web applications. We call them web scopes:
+ Request scope—Spring creates an instance of the bean class for every HTTP
+request. The instance exists only for that specific HTTP request.
+ Session scope—Spring creates an instance and keeps the instance in the server’s
+memory for the full HTTP session. Spring links the instance in the context with
+the client’s session.
+ Application scope—The instance is unique in the app’s context, and it’s available
+while the app is running.
+
+Most of the web apps today
+offer their users the possibility to log in and access an account, so the example is also
+relevant from a real-world perspective.
+In section 9.1, we’ll use a request-scoped bean to take the user’s credentials for
+login and make sure the app uses them only for the login request. Then, in section
+9.2, we’ll use a session-scoped bean to store all the relevant details we need to keep for
+the logged-in user as long as the user remains logged in. In section 9.3, we’ll use the
+application-scoped bean to add a capability to count logins. Figure 9.1 shows you the
+steps we take to implement this app.
+
++--------------------------------------------------+            +--------------------------------------------------+
+| STEP 1                                           |            | STEP 2                                           |
+| Implement the login logic.                       |            | Keep the logged in user details.                 |
+|                                                  |            |                                                  |
+| If the user provides a correct                   |            | Once the user correctly authenticates            |
+| set of credentials, the app                      |            | with their credentials, we want to keep          |
+| recognizes the user and confirms                 |            | them logged in for a period of time.             |
+| a successful login.                              |            |                                                  |
+|                                                  | ---------> | To store the user details and keep the           |
+| We don't want Spring to keep the                 |            | user logged in for a longer period of time,      |
+| credentials in the app's memory for              |            | we use the HTTP session through a                |
+| more than it takes the login request to          |            | session-scoped bean.                             |
+| finish, so we'll use a request-scoped            |            |                                                  |
+| bean to implement this functionality.            |            |                                                  |
++--------------------------------------------------+            +--------------------------------------------------+
+                                                                                          \
+                                                                                           \
+                                                                                            \
+                                                                                             v
+                                    +--------------------------------------------------+
+                                    | STEP 3                                           |
+                                    | Count the login requests.                        |
+                                    |                                                  |
+                                    | Finally, we want our app to count all the        |
+                                    | login requests from all the users. We need       |
+                                    | to store the total number of requests            |
+                                    | received by the app.                             |
+                                    |                                                  |
+                                    | To implement this functionlity, we'll            |
+                                    | need to use an application-scoped bean.          |
+                                    +--------------------------------------------------+
