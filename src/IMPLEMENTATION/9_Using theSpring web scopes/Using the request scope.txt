@@ -1,0 +1,86 @@
+Using the request scope in a Spring Web App
+A request-scoped bean is an object managed by Spring, for which the framework
+creates a new instance for every HTTP request. The app can use the instance only for
+the request that created it. Any new HTTP request (from the same or other clients)
+creates and uses a different instance of the same class (figure 9.2).
+
++-------------------------------------------------------------------------------------------------+
+|                                 FIGURE 9.2: REQUEST-SCOPED BEANS                                |
++-------------------------------------------------------------------------------------------------+
+
+  Richard is the user.
+     \
+    (O_O)         [ HTTP REQUEST 1 ]         +--------------------------------------------------+
+    /| |\   ===============================> | Spring context                                   |
+     / \                                     |                                                  |
+  Richard                                    |   Spring manages the type of the bean and        |
+  (Client)        For the first HTTP         |   creates a new instance for each HTTP request.  |
+                  request, Spring            |   In this figure, the coffee plant is the bean   |
+                  creates an instance        |   type Spring manages, and the coffee bean       |
+                  of the LoginProcessor      |   is the instance.                               |
+                  bean, which is             |                                                  |
+                  request-scoped.            |         _\|/_   (Coffee Plant / Bean Type)       |
+                         \                   |          \|/                                     |
+                          \                  |         --X--                                    |
+                           --------+         |           |                                      |
+                                   |         |           |                                      |
+                                   V         |           V                                      |
+                                             |       (       )                                  |
+                                             |      (  Ref.   )  LoginProcessor@56b49ef9        |
+                                             |       (_______)   (Coffee Bean Instance 1)       |
+                                             +--------------------------------------------------+
+
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    (O_O)         [ HTTP REQUEST 2 ]         +--------------------------------------------------+
+    /| |\   ===============================> | Spring context                                   |
+     / \                                     |                                                  |
+  Richard                                    |         _\|/_   (Coffee Plant / Bean Type)       |
+  (Client)        For a second HTTP          |          \|/                                     |
+                  request, Spring            |         --X--                                    |
+                  creates another            |           |                                      |
+                  instance of the            |           |                                      |
+                  LoginProcessor bean.       |           V                                      |
+                  Observe the hash of        |       (       )                                  |
+                  the instance is            |      (  Ref.   )  LoginProcessor@4be2b62e        |
+                  different in the           |       (_______)   (Coffee Bean Instance 2)       |
+                  Spring context.            |                                                  |
+                         \                   |       [ Notice the different object hash! ]      |
+                          +----------------> +--------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------+
+| Text Summary: For every HTTP request, Spring provides a new instance for the request-scoped     |
+| bean. When using a request-scoped bean, you can be sure the data you add on the bean is          |
+| available only on the HTTP request that created the bean.                                       |
++-------------------------------------------------------------------------------------------------+
+
+**Key aspects of request-scoped beans**
++---------------------+-----------------------+-------------------------+-------------------------+
+|        Fact         |      Consequence      |       To consider       |        To avoid         |
++=====================+=======================+=========================+=========================+
+| Spring creates      | Spring creates a lot   | The number of instances | However, make sure you  |
+| a new instance      | of instances of this  | is usually not a big    | don’t implement a time- |
+| for every HTTP      | bean in the app’s     | problem because these   | consuming logic Spring   |
+| request from        | memory during its     | instances are short-    | needs to execute to cre-|
+| any client.         | execution.            | lived. The app          | ate the instance (like  |
+|                     |                       | doesn’t need them for   | getting data from a     |
+|                     |                       | more than the time the  | database or implementing|
+|                     |                       | HTTP request needs to   | a network call). Avoid  |
+|                     |                       | complete. Once the HTTP | writing logic in the     |
+|                     |                       | request completes, the   | constructor or a        |
+|                     |                       | app releases the        | @PostConstruct method   |
+|                     |                       | instances, and they are | for request-scoped      |
+|                     |                       | garbage-collected.      | beans.                  |
++---------------------+-----------------------+-------------------------+-------------------------+
+| Only one request    | Instances of          | You can use the         | Don’t use               |
+| can use an instance | request-scoped beans  | instance’s attributes    | synchronization         |
+| of a request-scoped | are not prone to      | to store data used      | techniques for the      |
+| bean.               | multithread-related   | by request.             | attributes of these     |
+|                     | issues as only one    |                         | beans. These techniques |
+|                     | thread (the one of    |                         | would be redundant, and |
+|                     | the request) can      |                         | they only affect the    |
+|                     | access them.          |                         | performance of your     |
+|                     |                       |                         | app.                    |
++---------------------+-----------------------+-------------------------+-------------------------+
+
+NOTE : It's great for understanding purpose but in real-world we prefer to use Spring Security for obvious reasons.
