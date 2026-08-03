@@ -1,0 +1,74 @@
+In this section, we discuss session-scoped beans. When you enter a web app and log in,
+you expect to then surf through that app’s pages, and the app still remembers you’ve
+logged in. A session-scoped bean is an object managed by Spring, for which Spring
+creates an instance and links it to the HTTP session. Once a client sends a request to
+the server, the server reserves a place in the memory for this request, for the whole
+duration of their session. Spring creates an instance of a session-scoped bean when
+the HTTP session is created for a specific client. That instance can be reused for the
+same client while it still has the HTTP session active. The data you store in the session-
+scoped bean attribute is available for all the client’s requests throughout an HTTP ses-
+sion. This approach of storing the data allows you to store information about what
+users do while they’re surfing through the pages of your app.
+
+Figure 9.8 The session-scoped bean is used to keep a bean in the context throughout the client’s full
+HTTP session. Spring creates an instance of a session-scoped bean for each HTTP session a client opens.
+The client accesses the same instance for all the requests sent through the same HTTP session. Each
+user has their own session and accesses different instances of the session-scoped bean.
+
+A session-scoped bean allows us to store data shared
+by multiple requests of the same client.
+
+A couple of features you can implement using session-scoped beans include the
+following examples:
+ A login—Keeps details of the authenticated user while they visit different parts
+of your app and send multiple requests
+ An online shopping cart—Users visit multiple places in your app, searching for
+products they add to the cart. The cart remembers all the products the client
+added.
+
+Key aspects of session-scoped beans
+Like we did for the request-scoped beans, let's analyze the key characteristics of the 
+session-scoped beans you need to consider when planning to use them in a production app.
+
++-------------------------+-------------------------+------------------------------+------------------------------+
+| Fact                    | Consequence             | To consider                  | To avoid                     |
++-------------------------+-------------------------+------------------------------+------------------------------+
+| The session-scoped bean | They have a longer      | The app keeps the data you   | Avoid keeping too much data  |
+| instances are kept for  | life, and they are      | store in the session-scoped  | on the session. It can       |
+| the entire HTTP         | less frequently         | beans for a more extended    | potentially become a         |
+| session.                | garbage-collected       | period.                      | performance problem.         |
+|                         | than the request-       |                              | Moreover, never store        |
+|                         | scoped beans.           |                              | sensitive details (like      |
+|                         |                         |                              | passwords, private keys, or  |
+|                         |                         |                              | any other secret detail) in  |
+|                         |                         |                              | session-bean attributes.     |
++-------------------------+-------------------------+------------------------------+------------------------------+
+| Multiple requests can   | If the same client      | When you know such a         |                              |
+| share the session-      | issues multiple         | scenario is possible, you    |                              |
+| scoped bean instance.   | concurrent requests     | might need to use            |                              |
+|                         | that change the data    | synchronization techniques   |                              |
+|                         | on the instance, you    | to avoid concurrency.        |                              |
+|                         | may encounter           | However, I generally         |                              |
+|                         | multithreading-         | recommend you see if this    |                              |
+|                         | related issues like     | can be avoided and keep      |                              |
+|                         | race conditions.        | synchronization only as a    |                              |
+|                         |                         | last resort when it can't be |                              |
+|                         |                         | avoided.                     |                              |
++-------------------------+-------------------------+------------------------------+------------------------------+
+| The session-scoped      | The logic you           | When keeping details         |                              |
+| beans are a way to      | implement might imply   | stateful in one app's        |                              |
+| share data among        | requests become         | memory, you make clients     |                              |
+| requests by keeping     | dependent one on the    | dependent on that specific   |                              |
+| the data on the         | other.                  | app instance. Before         |                              |
+| server side.            |                         | deciding to implement some   |                              |
+|                         |                         | feature with a session-      |                              |
+|                         |                         | scoped bean, consider        |                              |
+|                         |                         | alternatives, such as        |                              |
+|                         |                         | storing the data you want to |                              |
+|                         |                         | share in a database instead  |                              |
+|                         |                         | of the session. This way,    |                              |
+|                         |                         | you can leave the HTTP       |                              |
+|                         |                         | requests independent one     |                              |
+|                         |                         | from another.                |                              |
++-------------------------+-------------------------+------------------------------+------------------------------+
+
