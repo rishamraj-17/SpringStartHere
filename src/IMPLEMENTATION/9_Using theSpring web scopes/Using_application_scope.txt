@@ -1,0 +1,67 @@
+In this section, we discuss the application scope. I want to mention its existence, make
+you aware of how it works, and emphasize that it’s better not to use it in a production
+app. All client requests share an application-scoped bean (figure 9.14).
+The application scope is close to how a singleton works. The difference is that you
+can’t have more instances of the same type in the context and that we always use the
+HTTP requests as a reference point when discussing the life cycle of web scopes
+(including the application scope). We face the same concurrency problems we dis-
+cussed in chapter 5 for the singleton beans for application-scoped beans: it’s better to
+have immutable attributes for the singleton beans. The same advice is applicable to an
+application-scoped bean. But if you make the attributes immutable, then you can
+directly use a singleton bean instead.
+Generally, I recommend developers avoid using application-scoped beans. It’s
+better to directly use a persistence layer, such as a database (which you’ll learn in
+chapter 11).
+It’s always best to see an example to understand the case. Let’s change the applica-
+tion we worked on in this chapter and add a feature that counts the login attempts.
+
+Because we have to count the login attempts from all users, we’ll store the count in an
+application-scoped bean. Let’s create a LoginCountService application-scoped bean
+that stores the count in an attribute. The following listing shows the definition of this
+class.
+
+@Service
+@ApplicationScope
+public class LoginCountService {
+private int count;
+public void increment() {
+count++;
+}
+public int getCount() {
+return count;
+}
+}
+
+The LoginProcessor can then auto-wire this bean and call the increment() method
+for any new login attempt, as presented in the following listing.
+
+Listing 9.13
+Incrementing the login count for every login request
+@Component
+@RequestScope
+public class LoginProcessor {
+private final LoggedUserManagementService loggedUserManagementService;
+private final LoginCountService loginCountService;
+private String username;
+private String password;
+
+public LoginProcessor(
+LoggedUserManagementService loggedUserManagementService,
+LoginCountService loginCountService) {
+this.loggedUserManagementService = loggedUserManagementService;
+this.loginCountService = loginCountService;
+}
+public boolean login() {
+loginCountService.increment();
+
+String username = this.getUsername();
+String password = this.getPassword();
+boolean loginResult = false;
+if ("natalie".equals(username) && "password".equals(password)) {
+loginResult = true;
+loggedUserManagementService.setUsername(username);
+}
+return loginResult;
+}
+// Omitted code
+}

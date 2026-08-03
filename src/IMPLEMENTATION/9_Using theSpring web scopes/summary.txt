@@ -1,0 +1,44 @@
+Summary: 
+
+Aside from the singleton and prototype bean scopes (discussed in chapters 2
+ through 5), you can benefit from using three more bean scopes in a Spring web
+app. These scopes only make sense in web apps, and that’s why we call them
+web scopes:
+– Request scope—Spring creates an instance of the bean for each HTTP request.
+– Session scope—Spring creates an instance of the bean per HTTP session of the
+client. Multiple requests from the same client can share the same instance.
+– Application scope—There’s only one instance for the whole application for
+that specific bean. Every request from any client can access this instance.
+
+Spring guarantees that a request-scoped bean instance is only accessible by one
+HTTP request. For this reason, you can use the instance’s attributes without
+worrying about concurrency-related problems. Also, you don’t need to worry
+that they might fill the app’s memory. Being they are short-lived, the instances
+can be garbage-collected once the HTTP request ends.
+
+Spring creates request-scoped bean instances for every HTTP request. This is
+quite often. You preferably shouldn’t make the instance’s creation difficult by
+implementing logic in the constructor or a @PostConstruct method.
+
+Spring links a session-scoped bean instance to the HTTP session of the client.
+This way, a session-scoped bean instance can be used to share data among mul-
+tiple HTTP requests from the same client.
+
+Even if from the same client, the client can send HTTP requests concurrently. If
+these requests change data in the session-scoped instance, they might get into
+race-condition scenarios. You need to consider such situations and either avoid
+them or synchronize your code to support the concurrency.
+
+I recommend avoiding the use of application-scoped bean instances. With appli-
+cation-scoped bean instances being shared by all the web app requests, any write
+operation usually needs synchronization, creating bottlenecks and dramatically
+affecting the app’s performance. Moreover, these beans live in your app’s mem-
+ory as long as the app itself, so they can’t be garbage-collected. A better approach
+is to directly store the data in a database, as you’ll learn in chapter 11.
+
+Both session- and application-scoped beans imply making requests less inde-
+pendent. We say the application manages the state the requests need (or that
+the app is stateful). A stateful app implies different architectural problems that
+are best to avoid. Of course, describing these problems is beyond the purpose
+of this book, but it’s a good to make you aware that it’s better to consider an
+alternative.
