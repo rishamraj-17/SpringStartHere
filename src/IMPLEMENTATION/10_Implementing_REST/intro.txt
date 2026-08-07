@@ -1,0 +1,3 @@
+REST offers access to functionality the server exposes through endpoints a client can call.
+-> to establish communication between client and server in a web app.
+-> to establish communication between mobile app and backend or two backend.

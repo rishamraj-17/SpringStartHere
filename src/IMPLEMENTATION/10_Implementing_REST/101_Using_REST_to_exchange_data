@@ -1,0 +1,78 @@
+REST is an approach for communication between applications using HTTP.
+REST endpoints are specific URL that exposes some functionality.
+An endpoint is usually defined by Method type + path(GET /products)
+
+REST Endpoint in Spring
+
+In Spring MVC:
+
+HTTP Request
+     ↓
+DispatcherServlet
+     ↓
+Controller
+     ↓
+Controller Method
+     ↓
+HTTP Response
+
+A REST endpoint is essentially:
+
+"A controller method mapped to an HTTP method and path."
+
+Traditional :
+------------ 
+Request
+   ↓
+Controller
+   ↓
+View name
+   ↓
+View Resolver
+   ↓
+HTML
+   ↓
+Response
+-----------
+
+REST: 
+-------
+Request
+   ↓
+Controller
+   ↓
+Data/Object
+   ↓
+HTTP Response
+------------
+
+Key difference : REST endpoints returns data directly instead of rendering view. The view resolver component isn't involved.
+
+@Controller
+    ↓
+Usually returns a view
+
+@RestController
+    ↓
+Returns data directly in HTTP response
+
+Takeaway: 
+------------------------------------
+REST
+ ↓
+Application-to-application communication over HTTP
+ ↓
+Endpoint = HTTP method + path + controller action
+ ↓
+Spring MVC handles the request
+ ↓
+Controller returns data
+ ↓
+No View Resolver
+ ↓
+Data is sent directly in HTTP response
+-------------------------------------
+
+Main advantage: Simple application-to-application communication.
+
+Main concern: The network can fail, requests can time out, data can be large, and servers can become overloaded.
