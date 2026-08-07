@@ -1,0 +1,58 @@
+In this section, we are going to learn about "How to convert a simple web controller to REST controller to implement REST web services?"
+
+Implementing a REST endpoint in controller class:
+@Controller
+public class HelloController(){
+//method to be used
+@GetMapping("/hello")
+@ResponseBody //tells dispatcher servlet that instead of view rendering, we need HTTP response direclty
+public String Hello(){
+return "hello";
+}
+}
+
+So, @ResponseBody works just fine for us. But, when we hundreds of thousands of method returning HTTP response directly, 
+it would be unpractical to annotate each method with @ResponseBody. That's why we got @RestController which tells dispatcher servlet 
+that all my methods responses are not view name but rather response themselves.
+
+So, instead of 
+@Controller
+public class HelloController(){
+//method to be used
+@GetMapping("/hello")
+@ResponseBody //tells dispatcher servlet that instead of view rendering, we need HTTP response direclty
+public String Hello(){
+return "hello";
+}
+//second method to be used
+@GetMapping("/bonjour")
+@ResponseBody
+public String Bonjour(){
+return "bonjour";
+}
+//3rd
+//4th
+//5th
+.
+.
+.
+.
+//nth
+}
+we prefer, 
+@RestController
+public class HelloController(){
+//method to be used
+@GetMapping("/hello")
+@ResponseBody //tells dispatcher servlet that instead of view rendering, we need HTTP response direclty
+public String Hello(){
+return "hello";
+}
+//
+//
+//
+//
+}
+
+So, implementation part was quite easy but how do we verify that our endpoints are working? 
+1. Postman	2. cURL

@@ -1,0 +1,40 @@
+The Http response is how the backend app sends data back to the client due to the client's request.
+The Http response holds data as following:
+1. HTTP RESPONSE HEADER
+2. HTTP RESPONSE BODY
+3. HTTP RESPONSE STATUS
+
+In section .1 and .2 we discuss about options we have for sending data in response body. Meanwhile in .3 we learnt to set response status and headers if needed.
+10.3.1 Sending Objects as Response body
+It's simple, we only needed to make controller's action return that object.
+We define a model object of Country with following attributes: 1. name	2.population
+We implement a controller's action to return Country instance.
+	When we use a model object to transfer between two apps, we name this object as Data Transfer Object(DTO).
+
+By default, Spring creates a string representation of the object and
+formats it as JSON. JavaScript Object Notation (JSON) is a simple way to format
+strings as attribute-value pairs.
+
+10.3.2 Setting response's status and header
+Status : 
+200 OK
+400 BAD REQUEST(not the way server expects data to arrive)
+404 NOT FOUND
+500 SERVER ERROR
+
+To customize the response, the easiest way is through ResponseEntity class.
+@RestController
+public class CountryController{
+@GetMapping("/france")
+public ResponseEntity<Country> france(){
+	Country c = Country.of("France",300);
+	return ResponseEntity
+		.status(HttpStatus.ACCEPTED) //sets status
+		.header("continent", "europe")
+		.header("capital", "Paris")
+		.body(c); //sets c as response body
+}
+}
+
+10.3.3 Managing exceptions at endpoint level
+
