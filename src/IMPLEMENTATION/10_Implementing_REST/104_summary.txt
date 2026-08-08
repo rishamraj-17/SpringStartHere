@@ -1,0 +1,28 @@
+Summary
+ Representational state transfer (REST) web services are a simple way to estab-
+lish communication between two applications.
+
+In a Spring app, the Spring MVC mechanism supports the implementation of
+REST endpoints. You either need to use the @ResponseBody annotation to specify
+that a method directly returns the response body or replace the @Controller
+annotation with @RestController to implement a REST endpoint. If you don’t
+use one of these, the dispatcher servlet will assume the controller’s method
+returns a view name and try to look for that view instead.
+
+You can make the controller’s action directly return the HTTP response body
+and rely on Spring default’s behavior for the HTTP status.
+
+You can manage the HTTP status and headers by making your controller’s
+action return a ResponseEntity instance.
+
+One way to manage exceptions is to treat them directly at the controller’s
+action level. This approach couples the logic used to treat the exception to that
+specific controller action. Sometimes using this approach can lead to code
+duplication, which is best to avoid.
+
+You can manage the exceptions in the controller’s action directly or separate
+the logic executed if the controller’s action throws an exception using a REST
+controller advice class.
+
+An endpoint can get data from the client through the HTTP request in request
+parameters, path variables, or the HTTP request body.

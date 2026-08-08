@@ -38,3 +38,224 @@ public ResponseEntity<Country> france(){
 
 10.3.3 Managing exceptions at endpoint level
 
+What happens when controller's action throws an exception? 
+In many cases we ourselves create exceptions to signal specific situation. (like insufficient balance or etc.)
+	In such a case, we want to set details on Http response to inform client of what situation has occured.
+One of ways is to catch response and using ResponseEntity class set a different configuration for the exception.
+
+public class NotEnoughMoneyExecption extends RuntimeException{}
+
+How could the controller decide what object to send back depending on how the flow
+executed? When there’s no exception (the app successfully completes the payment), we
+want to return an HTTP response with the status “Accepted” of type PaymentDetails.
+Suppose the app encountered an exception during the execution flow. In that case, the
+controller’s action returns an HTTP response with the status “400 Bad Request” and an
+ErrorDetails instance containing a message that describes the issue. Figure 10.8 visu-
+ally presents the relationship between the components and their responsibilities.
+
+  +-------------------+                      +-----------------------------------+                 +-----------------------------------+
+  |   Browser/Client  |                      |         PaymentController         |                 |          PaymentService           |
+  |                   |                      |                                   |                 |                                   |
+  |   +-----------+   |      -- HTTP ------> |  RESPONSIBILITY:                  | <-------------> |  RESPONSIBILITY:                  |
+  |   |  o  x     |   |                      |  Manages the exceptions the       |                 |  Implements the business          |
+  |   |  📊       |   |      <---- HTTP ---- |  service code might throw and     |<--------------> |  logic that might throw           |
+  |   +-----------+   |                      |  sends an HTTP response           |                 |  exceptions.                      |
+  +-------------------+                      +-----------------------------------+                 +-----------------------------------+
+Figure 10.8 The PaymentService class implements the business logic that might throw exceptions.
+The PaymentController class manages the exception and sends the client an HTTP response
+according to the execution result.
+
+Listing 10.8 Managing the HTTP response for exceptions in the controller’s action
+
+@RestController
+public class PaymentController {
+private final PaymentService paymentService;
+public PaymentController(PaymentService paymentService) {
+this.paymentService = paymentService;
+}
+@PostMapping("/payment")
+public ResponseEntity<?> makePayment() {
+try {
+PaymentDetails paymentDetails =
+paymentService.processPayment();
+
+//If calling the service method succeeds, we return an HTTP response with status Accepted and the PaymentDetails instance as a response body.
+return ResponseEntity
+	.status(HttpStatus.ACCEPTED)
+	.body(paymentDetails);
+} catch (NotEnoughMoneyException e) {
+ErrorDetails errorDetails = new ErrorDetails();
+errorDetails.setMessage("Not enough money to make the payment.");
+//If an exception of type NotEnoughMoneyException is thrown, we return an HTTP response with status Bad Request and an ErrorDetails instance as body
+return ResponseEntity
+	.badRequest()
+	.body(errorDetails);
+}
+}
+}
+
+This approach is good, and you’ll often find developers using it to manage the excep-
+tion cases.However, in a more complex application, you would find it more comfort-
+able to separate the responsibility of exception management. First, sometimes the
+same exception has to be managed for multiple endpoints, and, as you guessed, we
+don’t want to introduce duplicated code. Second, it’s more comfortable to know you
+find the exception logic all in one place when you need to understand how a specific
+case works. For these reasons, I prefer using a REST controller advice, an aspect that
+intercepts exceptions thrown by controllers’ actions and applies custom logic you
+define according to the intercepted exception.
+Figure 10.10 presents the changes we want to make in our class design. Take some
+time to compare this new class design with the one in figure 10.8.
+
+				       +-----------------------------------+
+                                       |     ExceptionControllerAdvice     |
+                                       |                                   |
+                                       |  RESPONSIBILITY:                  |
+                                       |  The controller advice implements |
+                                       |  the logic for cases where the    |
+                                       |  service has thrown an exception. |
+                                       +-----------------------------------+
+                                              |                      ^
+                                              | (ErrorDetails)       | (Exception)
+                                              v                      |
+  +-------------------+                +-----------------------------------+                 +-----------------------------------+
+  |   Browser/Client  |                |         PaymentController         |                 |          PaymentService           |
+  |                   |                |                                   |                 |                                   |
+  |   +-----------+   | -- HTTP ---->  |  RESPONSIBILITY:                  | <-------------> |  RESPONSIBILITY:                  |
+  |   |  o  x     |   |                |  The controller calls the service |                 |  The service class implements     |
+  |   |  📊       |   | <--- Payment-  |  use case but only treats the     |                 |  the business logic that might    |
+  |   +-----------+   |      Details   |  happy flow (where the service    |                 |  throw exceptions.                |
+  +-------------------+                +-----------------------------------+                 +-----------------------------------+
+       ^                                    
+       +-------------------- (ErrorDetails) -+
+Figure 10.10 Instead of managing the exception cases, the controller now only takes care of the happy
+flow. We added a controller advice named ExceptionControllerAdvice to take care of the logic that
+will be implemented if the controller’s action throws an exception.
+
+Listing 10.9 Controller’s action that no longer treats the exception case
+@RestController
+public class PaymentController {
+private final PaymentService paymentService;
+public PaymentController(PaymentService paymentService) {
+this.paymentService = paymentService;
+}
+@PostMapping("/payment")
+public ResponseEntity<PaymentDetails> makePayment() {
+PaymentDetails paymentDetails = paymentService.processPayment();
+return ResponseEntity
+.status(HttpStatus.ACCEPTED)
+.body(paymentDetails);
+}
+}
+
+Instead, we created a separate class named ExceptionControllerAdvice that imple-
+ments what happens if the controller’s action throws a NotEnoughMoneyException. The
+ExceptionControllerAdvice class is a REST controller advice. To mark it as a REST
+controller advice, we use the @RestControllerAdvice annotation. The method the
+class defines is also called an exception handler. You specify what exceptions trigger a
+controller advice method using the @ExceptionHandler annotation over the method.
+The following listing shows the REST controller advice class’s definition and the excep-
+tion handler method that implements the logic associated with the NotEnough-
+MoneyException exception.
+
+Listing 10.10 Separating the exception logic with a REST controller advice
+@RestControllerAdvice
+public class ExceptionControllerAdvice {
+We use the @RestControllerAdvice
+annotation to mark the class as a
+REST controller advice.
+@ExceptionHandler(NotEnoughMoneyException.class)
+public ResponseEntity<ErrorDetails> exceptionNotEnoughMoneyHandler() {
+ErrorDetails errorDetails = new ErrorDetails();
+errorDetails.setMessage("Not enough money to make the payment.");
+return ResponseEntity
+We use the @ExceptionHandler method to associate
+.badRequest()
+an exception with the logic the method implements.
+.body(errorDetails);
+}
+}
+
+Listing 10.10 Separating the exception logic with a REST controller advice
+@RestControllerAdvice
+public class ExceptionControllerAdvice {
+We use the @RestControllerAdvice
+annotation to mark the class as a
+REST controller advice.
+@ExceptionHandler(NotEnoughMoneyException.class)
+public ResponseEntity<ErrorDetails> exceptionNotEnoughMoneyHandler() {
+ErrorDetails errorDetails = new ErrorDetails();
+errorDetails.setMessage("Not enough money to make the payment.");
+return ResponseEntity
+We use the @ExceptionHandler method to associate
+.badRequest()
+an exception with the logic the method implements.
+.body(errorDetails);
+}
+}
+
+NOTE In production apps, you sometimes need to send information about
+the exception that occurred, from the controller’s action to the advice. In this
+case, you can add a parameter to the advice’s exception handler method of
+the type of the handled exception. Spring is smart enough to pass the excep-
+tion reference from the controller to the advice’s exception handler method.
+You can then use any details of the exception instance in the advice’s logic.
+
+@RestControllerAdvice
+public class ExceptionControllerAdvice { //We use the @RestControllerAdvice annotation to mark the class as a REST controller advice.
+
+@ExceptionHandler(NotEnoughMoneyException.class)
+public ResponseEntity<ErrorDetails> exceptionNotEnoughMoneyHandler() {
+ErrorDetails errorDetails = new ErrorDetails();
+errorDetails.setMessage("Not enough money to make the payment.");
+//We use the @ExceptionHandler method to associate an exception with the logic the method implements.
+return ResponseEntity
+	.badRequest()
+	.body(errorDetails);
+}
+}
+
+10.4 Using a request body to get data from the client
+In this section, we discuss getting data from the client in the HTTP request body. You
+learned in chapter 8 that you can send data in the HTTP request using request param-
+eters and path variables. Because REST endpoints rely on the same Spring MVC
+mechanism, nothing from the syntaxes you learned in chapter 8 changes regarding
+sending data in request parameters and path variables. You can use the same annota-
+tions and implement the REST endpoints identically as you were implementing the
+controller actions for your web pages.
+However, we didn’t discuss one essential thing: the HTTP request has a request
+body, and you can use it to send data from the client to the server. The HTTP request
+body is often used with REST endpoints. As also mentioned in appendix C, when you
+need to send a larger quantity of data (my recommendation is anything that takes
+more than 50 to 100 characters), you use the request body.
+To use the request body, you just need to annotate a parameter of the controller’s
+action with @RequestBody. By default, Spring assumes you used JSON to represent the
+parameter you annotated and will try to decode the JSON string into an instance of
+your parameter type. In the case Spring cannot decode the JSON-formatted string
+into that type, the app sends back a response with the status “400 Bad Request.” In the
+project “sq-ch10-ex7,” we implement a simple example of using the request body. The
+controller defines an action mapped to the /payment path with HTTP POST and
+expects to get a request body of PaymentDetails type. The controller prints the
+amount of the PaymentDetails object in the server’s console and sends the same
+object in the response body back to the client.
+
+@RestController
+public class PaymentController {
+private static Logger logger =
+Logger.getLogger(PaymentController.class.getName());
+@PostMapping("/payment")
+public ResponseEntity<PaymentDetails> makePayment(
+@RequestBody PaymentDetails paymentDetails) {
+logger.info("Received payment " +
+paymentDetails.getAmount());
+return ResponseEntity
+.status(HttpStatus.ACCEPTED)
+.body(paymentDetails);
+}}
+We get the payment
+details from the HTTP
+request body.
+We log the amount of the payment
+in the server’s console.
+We send back the payment details object
+in the HTTP response body, and we set the
+HTTP response status to 202 ACCEPTED.
